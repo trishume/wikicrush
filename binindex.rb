@@ -24,8 +24,8 @@ class Parser
     while @f.read(3) == "<p>"
       page
       count += 1
-      if count % 1000 == 0
-        puts "#{(count/@total*100).round}%"
+      if count % 5000 == 0
+        puts "#{(count/@total.to_f*100.0).round(3)}%"
       end
     end
     @out.close
@@ -52,12 +52,12 @@ class Parser
   def file_header
     @total = @db.execute("SELECT count(*) FROM pages").first.first
     # version, num articles, header length, extra
-    @out.write([1,article_count,FILE_HEADER_SIZE,0].pack("L*"))
+    @out.write([1,@total,FILE_HEADER_SIZE,0].pack("L*"))
   end
 
   def fill(ls)
     @out.write([0,ls.length].pack("LL")) # header
-    link_data = ls.map{ |l| get_offset(l)}.pack("L*")
+    link_data = ls.map{ |l| get_offset(l)}.compact.uniq.pack("L*")
     @out.write(link_data)
   end
 
@@ -69,8 +69,8 @@ class Parser
   end
 
   def get_offset(name)
-    rows = @db.execute("SELECT offset FROM pages WHERE title = ? LIMIT 1", name)
-    return 0 if rows.empty?
+    rows = @db.execute("SELECT offset FROM pages WHERE title = ? LIMIT 1", name.capitalize)
+    return nil if rows.empty?
     rows.first.first
   end
 end

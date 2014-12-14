@@ -6,8 +6,9 @@ class Parser
   HEADER_SIZE = 4*2
   attr_accessor :pos
 
-  def initialize(f)
+  def initialize(f,valid)
     @f = f
+    @valid = valid
     @pos = FILE_HEADER_SIZE
 
     @db = SQLite3::Database.new "xindex.db"
@@ -50,13 +51,13 @@ SQL
   end
 
   def links
-    count = 0
+    ls = []
     while @f.read(3) == "<l>"
-      count += 1
-      @f.gets("<")
+      name = @f.gets("<")[0..-2].capitalize
+      ls << name if @valid[name]
       match("/l>")
     end
-    count
+    ls.uniq.length
   end
 
   def page_at(i)
@@ -73,13 +74,21 @@ SQL
   end
 end
 
+puts "Building Validitity Hash"
+valid = {}
+IO.foreach("titles.txt") do |l|
+  valid[l.chomp] = true
+end
+
+puts "Parsing"
 f = File.open("/Users/tristan/misc/simplewiki-links.xml")
 # f = STDIN
-p = Parser.new(f)
+p = Parser.new(f,valid)
 if ARGV.length > 0
   p.page_at(ARGV.first.to_i)
 else
   p.header
   p.document
+  p.finish
   puts "File size: #{p.pos}"
 end
