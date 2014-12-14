@@ -1,15 +1,21 @@
 require "sqlite3"
 
 class Parser
+  FILE_HEADER_SIZE = 4*4
+  LINK_SIZE = 4
+  HEADER_SIZE = 4*2
+  attr_accessor :pos
+
   def initialize(f)
     @f = f
+    @pos = FILE_HEADER_SIZE
+
     @db = SQLite3::Database.new "xindex.db"
     @db.execute <<-SQL
 create table pages (
   title varchar(256) PRIMARY KEY,
-  offset int,
-  links int
-) WITHOUT ROWID;
+  offset int
+);
 SQL
     @db.execute("PRAGMA synchronous = OFF;")
   end
@@ -34,13 +40,13 @@ SQL
   end
 
   def page
-    loc = @f.pos - 3
     match("<t>")
     name = @f.gets("<")[0..-2] # title
     match("/t>")
     l = links
     match(">") # only thing left over after <l> tries to consume </p>
-    @db.execute("INSERT INTO pages (title, offset, links) VALUES (?,?,?)",[name,loc,l])
+    @db.execute("INSERT INTO pages (title, offset) VALUES (?,?)",[name,@pos])
+    @pos += HEADER_SIZE + LINK_SIZE*l
   end
 
   def links
@@ -75,4 +81,5 @@ if ARGV.length > 0
 else
   p.header
   p.document
+  puts "File size: #{p.pos}"
 end
