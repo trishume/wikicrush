@@ -3,7 +3,7 @@ require "sqlite3"
 class Parser
   FILE_HEADER_SIZE = 4*4
   LINK_SIZE = 4
-  HEADER_SIZE = 4*2
+  HEADER_SIZE = 4*3
   attr_accessor :pos
 
   def initialize(f)
@@ -56,7 +56,7 @@ class Parser
   end
 
   def fill(ls)
-    @out.write([0,ls.length].pack("LL")) # header
+    @out.write([0,ls.length,0].pack("LL")) # header
     link_data = ls.map{ |l| get_offset(l)}.compact.uniq.pack("L*")
     @out.write(link_data)
   end

@@ -3,7 +3,7 @@ require "sqlite3"
 class Parser
   FILE_HEADER_SIZE = 4*4
   LINK_SIZE = 4
-  HEADER_SIZE = 4*2
+  HEADER_SIZE = 4*3
   attr_accessor :pos
 
   def initialize(f,valid)
