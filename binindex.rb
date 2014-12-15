@@ -56,9 +56,9 @@ class Parser
   end
 
   def fill(ls)
-    @out.write([0,ls.length,0].pack("LL")) # header
-    link_data = ls.map{ |l| get_offset(l)}.compact.uniq.pack("L*")
-    @out.write(link_data)
+    link_data = ls.map{ |l| get_offset(l)}.compact.uniq
+    @out.write([0,link_data.length,0].pack("LLL")) # header
+    @out.write(link_data.pack("L*"))
   end
 
   private
