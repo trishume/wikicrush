@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    ox (2.1.4)
     progress (3.0.0)
     sqlite3 (1.3.10)
 
@@ -8,5 +9,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ox
   progress
   sqlite3
