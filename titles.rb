@@ -1,50 +1,21 @@
-class Parser
-  def initialize(f)
-    @f = f
-    @out = File.open("titles.txt","w")
-  end
+# Comment out filters you don't want
+def filter(title)
+  return false if title.include?(':')
+  # return false if title.include?('List of ')
+  true
+end
 
-  def header
-    # @f.seek(38)
-    @f.read(38)
-  end
 
-  def document
-    match("<d>")
-    count = 0
-    while @f.read(3) == "<p>"
-      page
-      count += 1
-      print '.' if count % 1000 == 0
-    end
-  end
-
-  def page
-    match("<t>")
-    name = @f.gets("<")[0..-2] # title
-    @out.puts name
-    match("/t>")
-    links
-    match(">") # only thing left over after <l> tries to consume </p>
-  end
-
-  def links
-    while @f.read(3) == "<l>"
-      @f.gets("<")
-      match("/l>")
-    end
-  end
-
-  private
-
-  def match(s)
-    x = @f.read(s.length)
-    raise "got #{x} expected #{s}" unless x == s
+def read_file(name,out)
+  IO.foreach(name) do |line|
+    title = line.chomp.split('|').first
+    out.puts title if filter(title)
   end
 end
 
-f = File.open("/Users/tristan/misc/simplewiki-links.xml")
-# f = STDIN
-p = Parser.new(f)
-p.header
-p.document
+out = File.open("titles.txt",'w')
+puts "Parsing links"
+read_file("links.txt",out)
+puts "Parsing redirects"
+read_file("redirects.txt",out)
+out.close

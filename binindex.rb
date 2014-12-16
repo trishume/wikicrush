@@ -75,6 +75,13 @@ class Parser
   end
 end
 
+puts "Building Redirect Hash"
+redirects = {}
+IO.foreach("redirects.txt") do |l|
+  key,val = l.chomp.split('|')
+  redirects[key] = val
+end
+
 f = File.open("/Users/tristan/misc/simplewiki-links.xml")
 # f = STDIN
 p = Parser.new(f)
