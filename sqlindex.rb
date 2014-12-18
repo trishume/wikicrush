@@ -1,4 +1,5 @@
 require "sqlite3"
+require "fileutils"
 
 class Parser
   FILE_HEADER_SIZE = 4*4
@@ -11,6 +12,7 @@ class Parser
     @valid = valid
     @pos = FILE_HEADER_SIZE
 
+    FileUtils.rm_f("xindex.db")
     @db = SQLite3::Database.new "xindex.db"
     @db.execute <<-SQL
 create table pages (
@@ -18,6 +20,7 @@ create table pages (
   offset int
 );
 SQL
+    @db.execute("CREATE INDEX pages_offset ON pages (offset)")
     @db.execute("PRAGMA synchronous = OFF;")
   end
 
