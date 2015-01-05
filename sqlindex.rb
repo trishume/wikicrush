@@ -11,6 +11,7 @@ class Parser
     @f = f
     @valid = valid
     @pos = FILE_HEADER_SIZE
+    @total = 0
 
     FileUtils.rm_f("xindex.db")
     @db = SQLite3::Database.new "xindex.db"
@@ -26,6 +27,8 @@ SQL
 
   def finish
     @db.execute("PRAGMA synchronous = ON;")
+    puts "Number of Pages: #{@total}"
+    puts "File size: #{@pos}"
   end
 
   def document
@@ -40,6 +43,7 @@ SQL
     l = filter_links(line)
     @db.execute("INSERT INTO pages (title, offset) VALUES (?,?)",[name,@pos])
     @pos += HEADER_SIZE + LINK_SIZE*l
+    @total += 1
   end
 
   def filter_links(ls)
@@ -59,4 +63,3 @@ f = File.open("links.txt")
 p = Parser.new(f,valid)
 p.document
 p.finish
-puts "File size: #{p.pos}"
