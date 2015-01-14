@@ -47,7 +47,7 @@ SQL
   end
 
   def filter_links(ls)
-    ls.select { |l| @valid[l.capitalize]}.uniq.length
+    ls.uniq.select { |l| @valid[l.capitalize]}.length
   end
 end
 
