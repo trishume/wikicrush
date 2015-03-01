@@ -18,7 +18,8 @@ class Parser
     @db.execute <<-SQL
 create table pages (
   title varchar(256) PRIMARY KEY,
-  offset int
+  offset int,
+  linkcount int
 );
 SQL
     @db.execute("CREATE INDEX pages_offset ON pages (offset)")
@@ -41,7 +42,7 @@ SQL
   def page(line)
     name = line.shift
     l = filter_links(line)
-    @db.execute("INSERT INTO pages (title, offset) VALUES (?,?)",[name,@pos])
+    @db.execute("INSERT INTO pages (title, offset, linkcount) VALUES (?,?,?)",[name,@pos,l])
     @pos += HEADER_SIZE + LINK_SIZE*l
     @total += 1
   end

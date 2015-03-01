@@ -11,6 +11,7 @@ class Parser
     @f = f
     @db = SQLite3::Database.new "xindex.db"
     @out = File.open("index.bin","w")
+    @fails = 0
     file_header
   end
 
@@ -21,12 +22,12 @@ class Parser
         puts "#{(i/@total.to_f*100.0).round(3)}%"
       end
     end
+    puts "Fails: #{@fails}"
     @out.close
   end
 
   def page(line)
-    line.shift # title
-    fill(line)
+    fill(line.shift, line)
   end
 
   def file_header
@@ -35,9 +36,16 @@ class Parser
     @out.write([1,@total,FILE_HEADER_SIZE,0].pack("L*"))
   end
 
-  def fill(ls)
+  def fill(title, ls)
+    offset, link_count = @db.execute("SELECT offset,linkcount FROM pages WHERE title = ? LIMIT 1", title).first
     link_data = ls.uniq.map{ |l| get_offset(l)}.compact
-    @out.write([0,link_data.length,0].pack("LLL")) # header
+    @out.write([0,link_count,0].pack("LLL")) # header
+    # Ensure correct number of links is written
+    if link_data.length < link_count
+      link_data += [offset] * (link_count - link_data.length)
+      puts "Fail on #{title} #{link_count} != #{link_data.length}"
+      @fails += 1
+    end
     @out.write(link_data.pack("L*"))
   end
 
