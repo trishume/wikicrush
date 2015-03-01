@@ -1,4 +1,5 @@
 require "sqlite3"
+require "triez"
 
 class Parser
   FILE_HEADER_SIZE = 4*4
@@ -61,7 +62,7 @@ class Parser
 end
 
 puts "Building Redirect Hash"
-redirects = {}
+redirects = Triez.new value_type: :object
 IO.foreach("redirects.txt") do |l|
   key,val = l.chomp.split('|').map{ |x| x.strip }
   redirects[key] = val

@@ -1,5 +1,6 @@
 require "sqlite3"
 require "fileutils"
+require "triez"
 
 class Parser
   FILE_HEADER_SIZE = 4*4
@@ -48,12 +49,12 @@ SQL
   end
 
   def filter_links(ls)
-    ls.uniq.select { |l| @valid[l.capitalize]}.length
+    ls.uniq.select { |l| @valid.has_key?(l.capitalize)}.length
   end
 end
 
 puts "Building Validity Hash"
-valid = {}
+valid = Triez.new value_type: :object
 IO.foreach("titles.txt") do |l|
   valid[l.strip] = true
 end

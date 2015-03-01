@@ -4,6 +4,7 @@ GEM
     ox (2.1.4)
     progress (3.0.0)
     sqlite3 (1.3.10)
+    triez (1.0.4)
 
 PLATFORMS
   ruby
@@ -12,3 +13,4 @@ DEPENDENCIES
   ox
   progress
   sqlite3
+  triez
