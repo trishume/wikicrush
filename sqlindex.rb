@@ -34,7 +34,7 @@ SQL
 
   def document
     IO.foreach(@f).with_index do |l,i|
-      page(l.chomp.split('|'))
+      page(l.chomp.split('|').map{ |x| x.strip })
       print '.' if i % 1000 == 0
     end
   end
@@ -52,10 +52,10 @@ SQL
   end
 end
 
-puts "Building Validitity Hash"
+puts "Building Validity Hash"
 valid = {}
 IO.foreach("titles.txt") do |l|
-  valid[l.chomp] = true
+  valid[l.strip] = true
 end
 
 puts "Parsing"

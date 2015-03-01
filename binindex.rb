@@ -17,7 +17,7 @@ class Parser
 
   def document
     IO.foreach(@f).with_index do |l,i|
-      page(l.chomp.split('|'))
+      page(l.chomp.split('|').map{ |x| x.strip })
       if i % 5000 == 0
         puts "#{(i/@total.to_f*100.0).round(3)}%"
       end
@@ -63,7 +63,7 @@ end
 puts "Building Redirect Hash"
 redirects = {}
 IO.foreach("redirects.txt") do |l|
-  key,val = l.chomp.split('|')
+  key,val = l.chomp.split('|').map{ |x| x.strip }
   redirects[key] = val
 end
 
