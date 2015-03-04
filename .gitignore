@@ -1,3 +1,1 @@
-*.db
-*.bin
-*.txt
+data/*

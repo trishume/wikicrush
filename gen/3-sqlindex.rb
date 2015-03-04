@@ -8,14 +8,14 @@ class Parser
   HEADER_SIZE = 4*3
   attr_accessor :pos
 
-  def initialize(f,valid)
+  def initialize(f,valid,db_path)
     @f = f
     @valid = valid
     @pos = FILE_HEADER_SIZE
     @total = 0
 
-    FileUtils.rm_f("xindex.db")
-    @db = SQLite3::Database.new "xindex.db"
+    FileUtils.rm_f(db_path)
+    @db = SQLite3::Database.new db_path
     @db.execute <<-SQL
 create table pages (
   title varchar(256) PRIMARY KEY,
@@ -53,15 +53,18 @@ SQL
   end
 end
 
+die "Usage: ruby 3-sqlindex.rb path/to/links.txt path/to/titles.txt path/to/put/xindex.db" unless ARGV.length == 3
+links_path, titles_path, db_path = ARGV
+
 puts "Building Validity Hash"
 valid = Triez.new value_type: :object
-IO.foreach("titles.txt") do |l|
+IO.foreach(titles_path) do |l|
   valid[l.strip] = true
 end
 
 puts "Parsing"
-f = File.open("links.txt")
+f = File.open(links_path)
 # f = STDIN
-p = Parser.new(f,valid)
+p = Parser.new(f,valid,db_path)
 p.document
 p.finish

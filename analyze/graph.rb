@@ -8,14 +8,14 @@ end
 
 class Graph
   HEADER_SIZE = 3
-  def initialize(f, dbg = true)
+  def initialize(f,db_path, dbg = true)
     @debug = dbg
     debug "loading file"
     @d = []
     f.each_chunk do |chunk|
       @d.concat(chunk.unpack("L*"))
     end
-    @db = SQLite3::Database.new "xindex.db"
+    @db = SQLite3::Database.new db_path
   end
 
   def at(p,i)

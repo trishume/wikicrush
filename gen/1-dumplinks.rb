@@ -2,9 +2,9 @@ require 'ox'
 
 class Handler < ::Ox::Sax
   LINK_REGEX = /\[\[([\w ]+)(?:\|[\w ]+)?\]\]|(&lt;!--)|(--!&gt;)/
-  def initialize
-    @link_file = File.open("links.txt","w")
-    @redir_file = File.open("redirects.txt","w")
+  def initialize(link_file, redir_file)
+    @link_file = File.open(link_file,"w")
+    @redir_file = File.open(redir_file,"w")
   end
 
   def start_element(name)
@@ -74,5 +74,6 @@ class Handler < ::Ox::Sax
   end
 end
 
-handler = Handler.new()
+die "Usage: cat wikidump.xml | ruby 1-dumplinks.rb path/to/put/links.txt path/to/put/redirects.txt" unless ARGV.length == 2
+handler = Handler.new(ARGV[0],ARGV[1])
 Ox.sax_parse(handler, STDIN)

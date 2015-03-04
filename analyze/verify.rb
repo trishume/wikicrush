@@ -6,9 +6,9 @@ class Parser
   LINK_SIZE = 4
   HEADER_SIZE = 4*3
 
-  def initialize(f)
+  def initialize(f,db_path)
     @f = f
-    @db = SQLite3::Database.new "xindex.db"
+    @db = SQLite3::Database.new db_path
   end
 
   def run
@@ -49,6 +49,7 @@ class Parser
   end
 end
 
-f = File.open("index.bin")
-p = Parser.new(f)
+die "pass bin file to verify and db to check against" if ARGV.length != 2
+f = File.open(ARGV[0])
+p = Parser.new(f, ARGV[1])
 p.run

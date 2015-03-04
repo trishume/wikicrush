@@ -5,9 +5,9 @@ class Parser
   LINK_SIZE = 4
   HEADER_SIZE = 4*3
 
-  def initialize(f)
+  def initialize(f, out_path)
     @f = f
-    @out = File.open("newindex.bin","w")
+    @out = File.open(out_path,"w")
   end
 
   def run
@@ -56,7 +56,9 @@ class Parser
     res
   end
 end
+die "Usage: ruby 5-doublelink.rb path/to/index.bin path/to/put/newindex.bin" unless ARGV.length == 2
+bin_path, out_path = ARGV
 
-f = File.open("index.bin")
-p = Parser.new(f)
+f = File.open(bin_path)
+p = Parser.new(f, out_path)
 p.run

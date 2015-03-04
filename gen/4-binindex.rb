@@ -7,11 +7,11 @@ class Parser
   HEADER_SIZE = 4*3
   attr_accessor :pos
 
-  def initialize(f,redirs)
+  def initialize(f,redirs,db_path,bin_path)
     @redirects = redirs
     @f = f
-    @db = SQLite3::Database.new "xindex.db"
-    @out = File.open("index.bin","w")
+    @db = SQLite3::Database.new db_path
+    @out = File.open(bin_path,"w")
     @fails = 0
     file_header
   end
@@ -61,13 +61,16 @@ class Parser
   end
 end
 
+die "Usage: ruby 4-binindex.rb path/to/links.txt path/to/redirects.txt path/to/xindex.db path/to/put/index.bin" unless ARGV.length == 4
+links_path, redirs_path, db_path, bin_path = ARGV
+
 puts "Building Redirect Hash"
 redirects = Triez.new value_type: :object
-IO.foreach("redirects.txt") do |l|
+IO.foreach(redirs_path) do |l|
   key,val = l.chomp.split('|').map{ |x| x.strip }
   redirects[key] = val
 end
 
-f = File.open("links.txt")
-p = Parser.new(f,redirects)
+f = File.open(links_path)
+p = Parser.new(f,redirects,db_path, bin_path)
 p.document
