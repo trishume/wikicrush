@@ -43,8 +43,8 @@ class Parser
     @out.write([0,link_count,0].pack("LLL")) # header
     # Ensure correct number of links is written
     if link_data.length < link_count
-      link_data += [offset] * (link_count - link_data.length)
       puts "Fail on #{title} #{link_count} != #{link_data.length}"
+      link_data += [offset] * (link_count - link_data.length)
       @fails += 1
     end
     @out.write(link_data.pack("L*"))
