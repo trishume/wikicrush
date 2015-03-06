@@ -65,7 +65,7 @@ class Handler < ::Ox::Sax
   end
 
   def do_real_page
-    @link_file.puts "#{@title}|#{@links.join('|')}"
+    @link_file.puts "#{@title}|#{@links.map{ |x| x.strip }.join('|')}"
   end
 
   def do_redirect
