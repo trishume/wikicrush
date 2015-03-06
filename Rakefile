@@ -30,3 +30,7 @@ end
 task :inspect, :page do |t, args|
   ruby "analyze/inspect.rb data/indexbi.bin data/xindex.db \"#{args[:page]}\""
 end
+
+task :link_stats do
+  ruby "analyze/link_stats.rb data/links.txt data/titles.txt"
+end
