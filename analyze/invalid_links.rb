@@ -14,7 +14,7 @@ STDERR.puts "Analyzing Links"
 count = 0
 IO.foreach(links_path) do |line|
   page, *links = line.chomp.split('|').map{ |x| x.strip }
-  invalid = links.map{ |x| x.capitalize }.uniq.reject { |l| valid.has_key?(l)}
+  invalid = links.uniq.reject { |l| valid.has_key?(l)}
   puts "# #{page}"
   invalid.each { |x| puts x }
   count += 1

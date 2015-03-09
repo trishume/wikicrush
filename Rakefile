@@ -4,7 +4,7 @@ file "data/links-raw.txt", :dump_path do |t,args|
   args.with_defaults(:dump_path => RAW_DUMP_PATH)
   dump = args[:dump_path]
   die "#{dump} must exist" unless File.exist?(dump)
-  sh "bzip2 -dc \"#{dump}\" | ruby gen/dumplinks.rb data/links-raw.txt data/redirects.txt"
+  sh "bzip2 -dc \"#{dump}\" | ruby gen/dumplinks.rb data/links-raw.txt data/redirects-raw.txt"
 end
 
 file "data/links-filt.txt" => ["data/links-raw.txt"] do
@@ -13,6 +13,10 @@ end
 
 file "data/links.txt" => ["data/links-filt.txt"] do
   ruby "gen/casenorm.rb data/links-filt.txt data/links.txt"
+end
+
+file "data/redirects.txt" => ["data/links-raw.txt"] do
+  ruby "gen/casenorm.rb data/redirects-raw.txt data/redirects.txt"
 end
 
 file "data/titles.txt" => ["data/links.txt"] do

@@ -39,7 +39,7 @@ class Parser
 
   def fill(title, ls)
     offset, link_count = @db.execute("SELECT offset,linkcount FROM pages WHERE title = ? LIMIT 1", title).first
-    link_data = ls.uniq.map{ |l| get_offset(l)}.compact
+    link_data = ls.map{ |l| get_offset(l)}.compact
     @out.write([0,link_count,0].pack("LLL")) # header
     # Ensure correct number of links is written
     if link_data.length < link_count
@@ -53,7 +53,6 @@ class Parser
   private
 
   def get_offset(name)
-    name = name.capitalize
     name = @redirects[name] || name
     rows = @db.execute("SELECT offset FROM pages WHERE title = ? LIMIT 1", name)
     return nil if rows.empty?

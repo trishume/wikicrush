@@ -49,7 +49,7 @@ SQL
   end
 
   def filter_links(ls)
-    ls.uniq.count { |l| @valid.has_key?(l.capitalize)}
+    ls.count { |l| @valid.has_key?(l)}
   end
 end
 
