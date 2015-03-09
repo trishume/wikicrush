@@ -38,3 +38,7 @@ end
 task :link_stats do
   ruby "analyze/link_stats.rb data/links.txt data/titles.txt"
 end
+
+task :invalid_links do
+  sh "ruby analyze/invalid_links.rb data/links.txt data/titles.txt 1000 > data/invalid-links.txt"
+end

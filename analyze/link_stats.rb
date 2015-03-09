@@ -18,7 +18,7 @@ IO.foreach(links_path) do |line|
     stats[:valid_pages] += 1
     stats[:links] += links.count
 
-    links_uniq = links.uniq
+    links_uniq = links.map { |x| x.capitalize }.uniq
     stats[:unique_links] += links_uniq.count
     stats[:valid_links] += links_uniq.count { |l| valid.has_key?(l.capitalize)}
   end
