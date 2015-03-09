@@ -20,9 +20,28 @@ struct Graph<'a> {
     data : &'a mut [u32],
 }
 
+struct PageIter<'a> {
+    g : &'a Graph<'a>,
+    cur : usize,
+}
+
+impl<'a> Iterator for PageIter<'a> {
+    type Item = usize;
+    fn next(&mut self) -> Option<usize> {
+        let next_page = self.cur + (PAGE_HEADER_SIZE+self.g.link_count(self.cur))*4;
+        self.cur = next_page;
+        if next_page >= self.g.data.len() * 4 { None } else { Some(next_page) }
+    }
+}
+
 impl<'a> Graph<'a> {
     fn first_page(&self) -> usize {
         FILE_HEADER_SIZE
+    }
+
+    fn find_next(&self, page : usize) -> Option<usize> {
+        let next_page = page + (PAGE_HEADER_SIZE+self.link_count(page))*4;
+        if next_page >= self.data.len() * 4 { None } else { Some(next_page) }
     }
 
     fn find_next_unmarked(&self,start : usize) -> Option<usize> {
@@ -32,6 +51,10 @@ impl<'a> Graph<'a> {
             if page >= self.data.len() * 4 { return None;}
         }
         Some(page)
+    }
+
+    fn pages(&self) -> PageIter {
+        PageIter {g: self, cur: self.first_page()}
     }
 
     fn page_count(&self) -> u32 {
@@ -46,10 +69,11 @@ impl<'a> Graph<'a> {
         self.data[page/4+PAGE_BID_LINKS] as usize
     }
 
-    fn links(&'a self, page : usize) -> &'a [u32] {
+    fn links(&'a self, page : usize) -> Vec<usize> {
         let start = page/4+PAGE_HEADER_SIZE;
         let end = start+self.link_count(page);
-        &self.data[start..end]
+        let link_range = &self.data[start..end];
+        link_range.iter().map(|x| *x as usize).collect::<Vec<usize>>()
     }
 
     fn set_user_data(&mut self, page : usize, data : u32) {
@@ -75,10 +99,61 @@ fn flood_fill(graph : &mut Graph, start_page : usize, mark : u32) -> u32 {
 
         for linked in graph.links(page) {
             // println!("Pushing link to {}", linked);
-            stack.push(*linked as usize);
+            stack.push(linked);
         }
     }
     marked_count
+}
+
+fn find_conn_components(graph : &mut Graph) {
+    let mut start_page = graph.first_page();
+    let mut comp_count = 0;
+    loop {
+        let count = flood_fill(graph, start_page,1);
+        if count > 100 {
+            println!("Found a connected component of {} nodes out of {} pages = {}.",
+                     count,graph.page_count(),(count as f32 / graph.page_count() as f32));
+        }
+        comp_count += 1;
+
+        let next_page = graph.find_next_unmarked(start_page);
+        match next_page {
+            Some(page) => start_page = page,
+            None => break,
+        }
+    }
+    println!("Found {} components.",comp_count);
+}
+
+fn fill_incoming_links(graph : &mut Graph) {
+    let mut page = graph.first_page();
+    // Increment link count on all linked to pages, then move to next
+    loop {
+        for linked in graph.links(page) {
+            let incd = graph.user_data(linked)+1;
+            graph.set_user_data(linked, incd);
+        }
+
+        match graph.find_next(page) {
+            None => break,
+            Some(new_page) => page = new_page,
+        }
+    }
+}
+
+static DATA_HIST_MAX : usize = 50;
+fn analyze_user_data(graph : &Graph) {
+    let mut hist : Vec<u32> = vec![0; DATA_HIST_MAX];
+    for page in graph.pages() {
+        let count = graph.user_data(page);
+        if (count as usize) < DATA_HIST_MAX {
+            hist[count as usize] += 1;
+        }
+    }
+    println!("Incoming links:");
+    for c in 0..hist.len() {
+        println!("{}: {}",c, hist[c]);
+    }
 }
 
 fn main() {
@@ -109,22 +184,12 @@ fn main() {
     }
     let mut graph = Graph { data: graph_data.as_mut_slice() };
     println!("Read {} words of file!", graph.data.len());
+    println!("Total pages: {}", graph.page_count());
 
-    let mut start_page = graph.first_page();
-    let mut comp_count = 0;
-    loop {
-        let count = flood_fill(&mut graph, start_page,1);
-        if count > 100 {
-            println!("Found a connected component of {} nodes out of {} pages = {}.",
-                     count,graph.page_count(),(count as f32 / graph.page_count() as f32));
-        }
-        comp_count += 1;
+    find_conn_components(&mut graph);
 
-        let next_page = graph.find_next_unmarked(start_page);
-        match next_page {
-            Some(page) => start_page = page,
-            None => break,
-        }
-    }
-    println!("Found {} components.",comp_count);
+    // println!("Finding incoming links...");
+    // fill_incoming_links(&mut graph);
+    // println!("Analyzing incoming links...");
+    // analyze_user_data(&graph);
 }
