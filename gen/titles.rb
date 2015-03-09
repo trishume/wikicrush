@@ -19,7 +19,7 @@ def read_file(name,out,redirects = false)
   end
 end
 
-die "Usage: ruby 2-titles.rb path/to/links.txt path/to/redirects.txt path/to/put/titles.txt" unless ARGV.length == 3
+raise "Usage: ruby 2-titles.rb path/to/links.txt path/to/redirects.txt path/to/put/titles.txt" unless ARGV.length == 3
 links_path, redir_path, titles_path = ARGV
 out = File.open(titles_path,'w')
 puts "Parsing links"

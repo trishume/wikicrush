@@ -53,7 +53,7 @@ SQL
   end
 end
 
-die "Usage: ruby 3-sqlindex.rb path/to/links.txt path/to/titles.txt path/to/put/xindex.db" unless ARGV.length == 3
+raise "Usage: ruby 3-sqlindex.rb path/to/links.txt path/to/titles.txt path/to/put/xindex.db" unless ARGV.length == 3
 links_path, titles_path, db_path = ARGV
 
 puts "Building Validity Hash"

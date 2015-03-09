@@ -74,6 +74,6 @@ class Handler < ::Ox::Sax
   end
 end
 
-die "Usage: cat wikidump.xml | ruby 1-dumplinks.rb path/to/put/links.txt path/to/put/redirects.txt" unless ARGV.length == 2
+raise "Usage: cat wikidump.xml | ruby 1-dumplinks.rb path/to/put/links.txt path/to/put/redirects.txt" unless ARGV.length == 2
 handler = Handler.new(ARGV[0],ARGV[1])
 Ox.sax_parse(handler, STDIN)

@@ -56,7 +56,7 @@ class Parser
     res
   end
 end
-die "Usage: ruby 5-doublelink.rb path/to/index.bin path/to/put/newindex.bin" unless ARGV.length == 2
+raise "Usage: ruby 5-doublelink.rb path/to/index.bin path/to/put/newindex.bin" unless ARGV.length == 2
 bin_path, out_path = ARGV
 
 f = File.open(bin_path)
