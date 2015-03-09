@@ -1,10 +1,14 @@
 RAW_DUMP_PATH = "data/pages-articles.xml.bz2"
 
-file "data/links.txt", :dump_path do |t,args|
+file "data/links-raw.txt", :dump_path do |t,args|
   args.with_defaults(:dump_path => RAW_DUMP_PATH)
   dump = args[:dump_path]
   die "#{dump} must exist" unless File.exist?(dump)
-  sh "bzip2 -dc \"#{dump}\" | ruby gen/1-dumplinks.rb data/links.txt data/redirects.txt"
+  sh "bzip2 -dc \"#{dump}\" | ruby gen/1-dumplinks.rb data/links-raw.txt data/redirects.txt"
+end
+
+file "data/links.txt" => ["data/links-raw.txt"] do
+  sh "grep -Ev \"^(File|Template|Wikipedia|Help|Draft)\" data/links-raw.txt > data/links.txt"
 end
 
 file "data/titles.txt" => ["data/links.txt"] do
