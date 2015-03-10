@@ -19,7 +19,7 @@ file "data/redirects.txt" => ["data/links-raw.txt"] do
   ruby "gen/casenorm.rb data/redirects-raw.txt data/redirects.txt"
 end
 
-file "data/titles.txt" => ["data/links.txt"] do
+file "data/titles.txt" => ["data/links.txt", "data/redirects.txt"] do
   ruby "gen/titles.rb data/links.txt data/redirects.txt data/titles.txt"
 end
 
