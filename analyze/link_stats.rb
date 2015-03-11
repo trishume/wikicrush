@@ -1,6 +1,6 @@
 require "triez"
 
-die "Usage: ruby link_stats.rb path/to/links.txt path/to/titles.txt" unless ARGV.length == 2
+raise "Usage: ruby link_stats.rb path/to/links.txt path/to/titles.txt" unless ARGV.length == 2
 links_path, titles_path = ARGV
 
 puts "Building Validity Hash"

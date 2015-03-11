@@ -1,6 +1,6 @@
 require "triez"
 
-die "Usage: ruby invalid_links.rb path/to/links.txt path/to/titles.txt max" unless ARGV.length == 3
+raise "Usage: ruby invalid_links.rb path/to/links.txt path/to/titles.txt max" unless ARGV.length == 3
 links_path, titles_path, max = ARGV
 MAX_PAGES = max.to_i
 

@@ -49,7 +49,7 @@ class Parser
   end
 end
 
-die "pass bin file to verify and db to check against" if ARGV.length != 2
+raise "pass bin file to verify and db to check against" if ARGV.length != 2
 f = File.open(ARGV[0])
 p = Parser.new(f, ARGV[1])
 p.run
