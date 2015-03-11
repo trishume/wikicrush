@@ -22,10 +22,10 @@ class Parser
 
   def do_page
     this_page = @f.pos
-    die "Header fail at #{this_page}" unless get_int == 0
-    die "No entry in page DB for #{this_page}" unless name(this_page)
+    raise "Header fail at #{this_page}" unless get_int == 0
+    raise "No entry in page DB for #{this_page}" unless name(this_page)
     num_links = get_int
-    die "Already processed" unless get_int == 0
+    raise "Already processed" unless get_int == 0
     @f.read(4*num_links)
     # (1..num_links).map {get_int}
   end
@@ -41,11 +41,6 @@ class Parser
     return nil if rs.empty?
     # rs.first.first
     true
-  end
-
-  def die(msg)
-    puts msg
-    exit(1)
   end
 end
 

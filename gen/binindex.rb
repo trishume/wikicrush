@@ -60,7 +60,7 @@ class Parser
   end
 end
 
-die "Usage: ruby 4-binindex.rb path/to/links.txt path/to/redirects.txt path/to/xindex.db path/to/put/index.bin" unless ARGV.length == 4
+raise "Usage: ruby 4-binindex.rb path/to/links.txt path/to/redirects.txt path/to/xindex.db path/to/put/index.bin" unless ARGV.length == 4
 links_path, redirs_path, db_path, bin_path = ARGV
 
 puts "Building Redirect Hash"

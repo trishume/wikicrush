@@ -3,7 +3,7 @@ RAW_DUMP_PATH = "data/pages-articles.xml.bz2"
 file "data/links-raw.txt", :dump_path do |t,args|
   args.with_defaults(:dump_path => RAW_DUMP_PATH)
   dump = args[:dump_path]
-  die "#{dump} must exist" unless File.exist?(dump)
+  raise "#{dump} must exist" unless File.exist?(dump)
   sh "bzip2 -dc \"#{dump}\" | ruby gen/dumplinks.rb data/links-raw.txt data/redirects-raw.txt"
 end
 
