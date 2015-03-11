@@ -42,7 +42,7 @@ class Handler < ::Ox::Sax
     when @in_text
       @real_text = true
       value.scan(LINK_REGEX) do |lin, op, clos|
-        p [lin,op,clos,@real_text]
+        # p [lin,op,clos,@real_text]
         if lin && @real_text
           @links << lin
         elsif op
@@ -76,5 +76,6 @@ class Handler < ::Ox::Sax
 end
 
 raise "Usage: cat wikidump.xml | ruby 1-dumplinks.rb path/to/put/links.txt path/to/put/redirects.txt" unless ARGV.length == 2
+puts "Dumping links..."
 handler = Handler.new(ARGV[0],ARGV[1])
 Ox.sax_parse(handler, STDIN)
