@@ -35,6 +35,11 @@ file "data/indexbi.bin" => ["data/index.bin"] do
   ruby "gen/doublelink.rb data/index.bin data/indexbi.bin"
 end
 
+directory "bin"
+file "bin/strong_conn" => ["bin"] do
+  sh "rustc -O -o bin/strong_conn analyze/strong_conn.rs"
+end
+
 task :verify => "data/index.bin" do
   ruby "analyze/verify.rb data/index.bin data/xindex.db"
 end
@@ -49,4 +54,8 @@ end
 
 task :invalid_links do
   sh "ruby analyze/invalid_links.rb data/links.txt data/titles.txt 1000 > data/invalid-links.txt"
+end
+
+task :strong_conn => ["bin/strong_conn"] do
+  sh "./bin/strong_conn data/index.bin"
 end
