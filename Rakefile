@@ -8,13 +8,14 @@ file "data/links-raw.txt", :dump_path do |t,args|
 end
 
 file "data/links-filt.txt" => ["data/links-raw.txt"] do
-  sh "grep -Ev \"^(File|Template|Wikipedia|Help|Draft)\" data/links-raw.txt > data/links-filt.txt"
+  sh "grep -Ev \"^(File|Template|Wikipedia|Help|Draft):\" data/links-raw.txt > data/links-filt.txt"
 end
 
 file "data/links.txt" => ["data/links-filt.txt"] do
   ruby "gen/casenorm.rb data/links-filt.txt data/links.txt"
 end
 
+# This also requires redirects-raw.txt
 file "data/redirects.txt" => ["data/links-raw.txt"] do
   ruby "gen/casenorm.rb data/redirects-raw.txt data/redirects.txt"
 end
