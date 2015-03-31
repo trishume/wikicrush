@@ -8,7 +8,17 @@ It can compress a recent 10GB compressed Wikipedia dump into a 500MB binary link
 
 Wikicrush was created for use in [Rate With Science](http://github.com/trishume/ratewithscience) where it allows sub-second breadth-first searches through all of Wikipedia on a cheap VPS with 1GB of RAM.
 
+
 # The Files
+
+## Features
+- Relatively small binary graph data fits in memory allowing fast processing.
+- Format design allows tight loops without external table lookups.
+- Properly skips commented out links that don't show up on rendered Wikipedia pages.
+- All links are validated to only include ones that go to valid pages.
+- Link edges go through redirects transparently.
+- Link lists sorted with bidirectional edges first.
+- Provides space to store node data during graph algorithm processing.
 
 ## Primary Data
 
@@ -116,3 +126,10 @@ Refer to the Rakefile for which files depend on which others. If one of the step
 You may also want to modify some of the steps if you want. Particularly the article filtering step in case you want to for example exclude "List of X" articles.
 
 This also works for other wikis such as the Simple English Wikipedia, I use the simple english wiki dump for testing because it is much smaller so all the steps run in minutes rather than hours, but it is still in a language I understand.
+
+## Tips for Use
+
+- Read the `indexbi.bin` file into a big int32 array.
+- Make good use of the user data storage in your algorithms. If you want to use an external table simply fill the user data segments with incrementing indices into that table.
+- Try to only use the Sqlite file at the edges of your algorithm when communicating with the user. I translate the user input to offsets before I start and then the graph algorithm output back to titles after I'm done. Thus avoiding touching strings during processing.
+- Check out the code I've wrote that uses and generates these files. There's Ruby and Rust in this repo and Nim and more Rust in my `ratewithscience` repo.
