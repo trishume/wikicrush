@@ -1,7 +1,7 @@
 require 'ox'
 
 class Handler < ::Ox::Sax
-  LINK_REGEX = /\[\[([\w ]+)(?:\|[\w ]+)?\]\]|(&lt;!--)|(--&gt;)/
+  LINK_REGEX = /\[\[([^|\]]+)(?:\|[^\]]+)?\]\]|(&lt;!--)|(--&gt;)/
   def initialize(link_file, redir_file)
     @link_file = File.open(link_file,"w")
     @redir_file = File.open(redir_file,"w")
