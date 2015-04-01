@@ -23,12 +23,12 @@ file "data/links.txt" => ["data/links-filt.txt","data/redirects.txt","data/title
   ruby "gen/proclinks.rb data/titles.txt data/redirects.txt data/links-filt.txt data/links.txt"
 end
 
-file "data/xindex.db" => ["data/links.txt","data/titles.txt"] do
-  ruby "gen/sqlindex.rb data/links.txt data/titles.txt data/xindex.db"
+file "data/xindex.db" => ["data/links.txt"] do
+  ruby "gen/sqlindex.rb data/links.txt data/xindex.db"
 end
 
 file "data/index.bin" => ["data/links.txt","data/xindex.db"] do
-  ruby "gen/binindex.rb data/links.txt data/redirects.txt data/xindex.db data/index.bin"
+  ruby "gen/binindex.rb data/links.txt data/xindex.db data/index.bin"
 end
 
 file "data/indexbi.bin" => ["data/index.bin"] do

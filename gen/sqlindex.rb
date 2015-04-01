@@ -8,9 +8,8 @@ class Parser
   HEADER_SIZE = 4*3
   attr_accessor :pos
 
-  def initialize(f,valid,db_path)
+  def initialize(f,db_path)
     @f = f
-    @valid = valid
     @pos = FILE_HEADER_SIZE
     @total = 0
 
@@ -19,8 +18,7 @@ class Parser
     @db.execute <<-SQL
 create table pages (
   title varchar(256) PRIMARY KEY,
-  offset int,
-  linkcount int
+  offset int
 );
 SQL
     @db.execute("CREATE INDEX pages_offset ON pages (offset)")
@@ -43,28 +41,22 @@ SQL
   def page(line)
     name = line.shift
     l = filter_links(line)
-    @db.execute("INSERT INTO pages (title, offset, linkcount) VALUES (?,?,?)",[name,@pos,l])
+    @db.execute("INSERT INTO pages (title, offset) VALUES (?,?)",[name,@pos])
     @pos += HEADER_SIZE + LINK_SIZE*l
     @total += 1
   end
 
   def filter_links(ls)
-    ls.count { |l| @valid.has_key?(l)}
+    ls.length
   end
 end
 
-raise "Usage: ruby 3-sqlindex.rb path/to/links.txt path/to/titles.txt path/to/put/xindex.db" unless ARGV.length == 3
-links_path, titles_path, db_path = ARGV
-
-puts "Building Validity Hash"
-valid = Triez.new value_type: :object
-IO.foreach(titles_path) do |l|
-  valid[l.strip] = true
-end
+raise "Usage: ruby 3-sqlindex.rb path/to/links.txt path/to/put/xindex.db" unless ARGV.length == 2
+links_path, db_path = ARGV
 
 puts "Parsing"
 f = File.open(links_path)
 # f = STDIN
-p = Parser.new(f,valid,db_path)
+p = Parser.new(f,db_path)
 p.document
 p.finish

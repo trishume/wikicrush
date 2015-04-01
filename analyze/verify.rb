@@ -26,7 +26,8 @@ class Parser
     raise "No entry in page DB for #{this_page}" unless name(this_page)
     num_links = get_int
     raise "Already processed" unless get_int == 0
-    @f.read(4*num_links)
+    borked_links = @f.read(4*num_links).unpack("L*").reject { |p| name(p) }
+    raise "Borked links for #{this_page}: #{borked_links.inspect}" unless borked_links.empty?
     # (1..num_links).map {get_int}
   end
 
