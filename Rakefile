@@ -19,8 +19,8 @@ file "data/redirects.txt" => ["data/links-raw.txt","data/titles.txt"] do
   ruby "gen/filtredirs.rb data/titles.txt data/redirects-raw.txt data/redirects.txt"
 end
 
-file "data/links.txt" => ["data/links-filt.txt"] do
-  ruby "gen/casenorm.rb data/links-filt.txt data/links.txt"
+file "data/links.txt" => ["data/links-filt.txt","data/redirects.txt","data/titles.txt"] do
+  ruby "gen/proclinks.rb data/titles.txt data/redirects.txt data/links-filt.txt data/links.txt"
 end
 
 file "data/xindex.db" => ["data/links.txt","data/titles.txt"] do

@@ -6,7 +6,7 @@ titles_path, redir_path, out_path = ARGV
 puts "Building Validity Hash"
 valid = Triez.new value_type: :object
 IO.foreach(titles_path) do |l|
-  valid[l.split('|').first.strip] = true
+  valid[l.chomp] = true
 end
 
 puts "Processing..."

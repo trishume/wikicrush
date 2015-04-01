@@ -1,7 +1,7 @@
 require 'ox'
 
 class Handler < ::Ox::Sax
-  LINK_REGEX = /\[\[([^|\]]+)(?:\|[^\]]+)?\]\]|(&lt;!--)|(--&gt;)/
+  LINK_REGEX = /\[\[([^|\n\]]+)(?:\|[^\n\]]+)?\]\]|(&lt;!--)|(--&gt;)/
   def initialize(link_file, redir_file)
     @link_file = File.open(link_file,"w")
     @redir_file = File.open(redir_file,"w")
@@ -44,7 +44,7 @@ class Handler < ::Ox::Sax
       value.scan(LINK_REGEX) do |lin, op, clos|
         # p [lin,op,clos,@real_text]
         if lin && @real_text
-          @links << lin
+          @links << lin if lin.length < 100
         elsif op
           @real_text = false
         elsif clos

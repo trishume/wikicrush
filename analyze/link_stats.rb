@@ -14,6 +14,7 @@ stats = Hash.new(0)
 IO.foreach(links_path) do |line|
   page, *links = line.chomp.split('|').map{ |x| x.strip }
   stats[:pages] += 1
+  p [page,links,line] unless page
   if valid.has_key?(page)
     stats[:valid_pages] += 1
     stats[:links] += links.count

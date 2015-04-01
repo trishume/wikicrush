@@ -1,6 +1,8 @@
 wikicrush
 =========
 
+**WARNING:** The code doesn't really work right now as I'm in the middle of a major refactor after discovering a significant bug.
+
 Extracts link graphs in a variety of formats from Wikipedia data dumps.
 This includes a highly compact binary graph format designed for very efficient graph searches.
 
