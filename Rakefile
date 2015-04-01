@@ -11,17 +11,16 @@ file "data/links-filt.txt" => ["data/links-raw.txt"] do
   sh "grep -Ev \"^(File|Template|Wikipedia|Help|Draft):\" data/links-raw.txt > data/links-filt.txt"
 end
 
+file "data/titles.txt" => ["data/links-filt.txt"] do
+  sh "cut -d'|' -f1 data/links-filt.txt > data/titles.txt"
+end
+
+file "data/redirects.txt" => ["data/links-raw.txt","data/titles.txt"] do
+  ruby "gen/filtredirs.rb data/titles.txt data/redirects-raw.txt data/redirects.txt"
+end
+
 file "data/links.txt" => ["data/links-filt.txt"] do
   ruby "gen/casenorm.rb data/links-filt.txt data/links.txt"
-end
-
-# This also requires redirects-raw.txt
-file "data/redirects.txt" => ["data/links-raw.txt"] do
-  ruby "gen/casenorm.rb data/redirects-raw.txt data/redirects.txt"
-end
-
-file "data/titles.txt" => ["data/links.txt", "data/redirects.txt"] do
-  ruby "gen/titles.rb data/links.txt data/redirects.txt data/titles.txt"
 end
 
 file "data/xindex.db" => ["data/links.txt","data/titles.txt"] do
