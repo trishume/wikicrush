@@ -32,7 +32,12 @@ file "data/index.bin" => ["data/links.txt","data/xindex.db"] do
 end
 
 file "data/indexbi.bin" => ["data/index.bin"] do
-  ruby "gen/doublelink.rb data/index.bin data/indexbi.bin"
+  if system("which","nim")
+    sh "nim c -d:release gen/doublelink.nim"
+    sh "./gen/doublelink"
+  else
+    ruby "gen/doublelink.rb data/index.bin data/indexbi.bin"
+  end
 end
 
 directory "bin"

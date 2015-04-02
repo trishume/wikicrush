@@ -1,2 +1,4 @@
 data/*
 bin
+gen/doublelink
+gen/nimcache

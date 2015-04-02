@@ -112,6 +112,7 @@ The only point of using this file is if you don't want to bother generating `ind
 
 ## Generating the Files
 
+1. Install Ruby+Bundler and optionally [Nim](http://nim-lang.org/) to make one process WAY faster.
 1. Git clone the latest wikicrush
 1. Run `bundle install` in the wikicrush directory.
 1. Download the latest `enwiki-<some_date>-pages-articles.xml.bz2`
