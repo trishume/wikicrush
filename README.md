@@ -1,12 +1,10 @@
-wikicrush
+Wikicrush
 =========
-
-**WARNING:** The code doesn't really work right now as I'm in the middle of a major refactor after discovering a significant bug.
 
 Extracts link graphs in a variety of formats from Wikipedia data dumps.
 This includes a highly compact binary graph format designed for very efficient graph searches.
 
-It can compress a recent 10GB compressed Wikipedia dump into a 500MB binary link graph and a 500MB sqlite database for translating article names into binary graph offsets.
+It can compress a recent 10GB compressed Wikipedia dump into a 630MB binary link graph and a 550MB sqlite database for translating article names into binary graph offsets.
 
 Wikicrush was created for use in [Rate With Science](http://github.com/trishume/ratewithscience) where it allows sub-second breadth-first searches through all of Wikipedia on a cheap VPS with 1GB of RAM.
 
@@ -21,12 +19,13 @@ Wikicrush was created for use in [Rate With Science](http://github.com/trishume/
 - Link edges go through redirects transparently.
 - Link lists sorted with bidirectional edges first.
 - Provides space to store node data during graph algorithm processing.
+- Tested and verified to accurately capture the links over many weeks of bug fixing and use in Rate With Science.
 
 ## Primary Data
 
 ### indexbi.bin
 
-This is the most important and awesome file, the crown jewel of the wikicrush project. It is a dense binary link graph that does not contain the titles of the articles and links to offsets within itself. This way one can run graph algorithms in tight loops without having to deal with strings and lookup tables. The graph transparently follows redirects in that if a page links to a redirect, it will be included in the file as a link to the page that the redirect goes to. Also note some pages link to themselves.
+This is the most important and awesome file, the crown jewel of the Wikicrush project. It is a dense binary link graph that does not contain the titles of the articles and links to offsets within itself. This way one can run graph algorithms in tight loops without having to deal with strings and lookup tables. The graph transparently follows redirects in that if a page links to a redirect, it will be included in the file as a link to the page that the redirect goes to. Also note some pages link to themselves.
 
 The file is a big array of 32-bit (4 byte) little-endian integers. This should be convenient to load into a big int array in the language of your choice.
 
@@ -62,43 +61,52 @@ create table pages (
 );
 CREATE INDEX pages_offset ON pages (offset);
 ```
-`title` is the lowercase article name, `offset` is the byte offset in the `indexbi.bin` file and `linkcount` is the number of links the article has.
+`title` is the article name, `offset` is the byte offset in the `indexbi.bin` file and `linkcount` is the number of links the article has.
 
 It is how one maps from article titles to offsets in the `indexbi.bin` and `index.bin` files and back again.
 It has indexes for both ways so is reasonably fast. It is used like this, at least in Ruby:
 ```ruby
 def title_to_offset(s)
+  # Use COLLATE NOCASE if accepting human input and don't want case sensitivity
   rs = @db.execute("SELECT offset FROM pages WHERE title = ? LIMIT 1",s)
   return nil if rs.empty?
   rs.first.first
 end
 ```
 
-## Intermediate Files
-These may be useful data but they are less polished than the primary files. They are used in the generation of the primary files. They are generally in easier formats (text) but contain gotchas that make them harder to work with like links to invalid pages.
+Note that this table does not contain redirects, that is something that might come in a future version.
 
 ### links.txt
 
-This is the most basic of the files. It is a text file with a line for every article with the article name followed by a `|` followed by all the links it has separated by `|` characters. All article titles and link names are lower cased. Note that this link list also includes invalid links and links that go to redirects rather than articles. It is the simplest format but in some ways the hardest to handle robustly. It looks like this:
+This is a text file with a line for every article with the article name followed by all the links it has separated by `|` characters. All links are with redirects already followed and all links are verified to point to a valid page and are unique-d (no link included more than once). This is the easiest file to work with for some cases but certainly not the most efficient.
+
+Here's an example with many links truncated since these pages actually have hundreds of links:
 
 ```
-albedo|latin|diffuse reflection|dimensionless number|frequency|visible light
-alabama|flag of alabama|seal of alabama|red hills salamander|northern flicker
+A|Letter (alphabet)|Vowel|ISO basic Latin alphabet|Alpha|Italic type
+Achilles|Kantharos|Vulci|Cabinet des Médailles|Phthia|Thetis|Chiton (costume)
 ```
+
+Note that this is meant to be parsed with a `split` operation and as such a page with no links is just the page name with no `|`.
+
+
+## Intermediate Files
+These may be useful data but they are less polished than the primary files. They are used in the generation of the primary files. They are generally in easier formats (text) but contain gotchas that make them harder to work with like links to invalid pages.
+
 
 Except the lines are way way longer since articles often have hundreds of links.
 
 ### redirects.txt
 
-Text file containing one line for every redirect on Wikipedia. With the redirect followed by the page it redirects to separated by a `|`. Both source and target are lowercased, this leads to many like `africa|africa` which previously redirected to different capitalizations but no longer make sense. Redirects are not guaranteed to point to valid pages.
+Text file containing one line for every redirect on Wikipedia. With the redirect followed by the page it redirects to separated by a `|`. Filtered to only include redirects where the target is a valid page and the source is not a valid page.
 
 ### titles.txt
 
-Contains all valid pages and redirects that point to valid pages. Lowercased one per line.
+Contains the titles of all valid pages one per line.
 
 ### links-raw.txt and redirects-raw.txt
 
-These are the files produced directly from the wiki dump. They are **not** lowercased and not filtered.
+These are the files produced directly from the wiki dump.
 They still contain `File:`, `Wikipedia:`, etc... pages.
 
 ### links-filt.txt
@@ -113,15 +121,13 @@ The only point of using this file is if you don't want to bother generating `ind
 ## Generating the Files
 
 1. Install Ruby+Bundler and optionally [Nim](http://nim-lang.org/) to make one process WAY faster.
-1. Git clone the latest wikicrush
-1. Run `bundle install` in the wikicrush directory.
+1. Git clone the latest Wikicrush
+1. Run `bundle install` in the `wikicrush` directory.
 1. Download the latest `enwiki-<some_date>-pages-articles.xml.bz2`
-1. Symlink (or move) the dump into the `data` directory of your wikicrush clone as `data/pages-articles.xml.bz2`
-1. Run `rake data/indexbi.bin` in the wikicrush directory.
-1. Wait somewhere between 12-48 hours depending on how fast your computer is. At times this will take up to 3GB of RAM and 8GB of hard drive space.
+1. Symlink (or move) the dump into the `data` directory of your Wikicrush clone as `data/pages-articles.xml.bz2`
+1. Run `rake data/indexbi.bin` in the `wikicrush` directory.
+1. Wait somewhere between 12-48 hours depending on how fast your computer is. At times this will take up to 3GB of RAM and 15GB of hard drive space.
 1. Tada you have the data files!
-
-One of these processes will talk about "Fail"s, don't worry about this, it is expected. There is a bug that affects %0.1 of Wikipedia articles where the link count at different stages differs by one. These pages simply have an extra link to themself added to compensate.
 
 If you want to do this in a more nuanced way there's more fine grained control. You can ask Rake to generate the files one at a time and delete the intermediate steps when you no longer need them to save disk space if you want.
 Refer to the Rakefile for which files depend on which others. If one of the steps crashes on you due to lack of disk space or memory, delete the half-finished file it was working on, resolve the issue and re-run the rake command.
