@@ -8,6 +8,12 @@ It can compress a recent 10GB compressed Wikipedia dump into a 630MB binary link
 
 Wikicrush was created for use in [Rate With Science](http://github.com/trishume/ratewithscience) where it allows sub-second breadth-first searches through all of Wikipedia on a cheap VPS with 1GB of RAM.
 
+### Getting the Data
+
+You can either run the process yourself and get all the files plus control over the source dump by following the steps at the bottom or you can use the download I have prepared.
+
+The download is a zip file containing just `xindex.db` and `indexbi.bin` and was generated from `enwiki-20150205-pages-articles.xml.bz2` (i.e the February 2015 english Wikipedia dump). The file is 740MB and can be downloaded here: [http://thume.net/bigdownloads/wikidata.zip](http://thume.net/bigdownloads/wikidata.zip).
+
 
 # The Files
 
@@ -56,12 +62,11 @@ This is an Sqlite database with a single table containing 3 columns and a row fo
 ```sql
 create table pages (
   title varchar(256) PRIMARY KEY,
-  offset int,
-  linkcount int
+  offset int
 );
 CREATE INDEX pages_offset ON pages (offset);
 ```
-`title` is the article name, `offset` is the byte offset in the `indexbi.bin` file and `linkcount` is the number of links the article has.
+`title` is the article name, `offset` is the byte offset in the `indexbi.bin` file.
 
 It is how one maps from article titles to offsets in the `indexbi.bin` and `index.bin` files and back again.
 It has indexes for both ways so is reasonably fast. It is used like this, at least in Ruby:
