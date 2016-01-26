@@ -39,15 +39,16 @@ SQL
   end
 
   def page(line)
-    name = line.shift
-    l = filter_links(line)
+    name = line[0]
+    l = num_links(line)
     @db.execute("INSERT INTO pages (title, offset) VALUES (?,?)",[name,@pos])
     @pos += HEADER_SIZE + LINK_SIZE*l
     @total += 1
   end
 
-  def filter_links(ls)
-    ls.length
+  def num_links(ls)
+    # First is name, second is meta
+    ls.length-2
   end
 end
 

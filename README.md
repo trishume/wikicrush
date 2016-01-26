@@ -83,13 +83,15 @@ Note that this table does not contain redirects, that is something that might co
 
 ### links.txt
 
-This is a text file with a line for every article with the article name followed by all the links it has separated by `|` characters. All links are with redirects already followed and all links are verified to point to a valid page and are unique-d (no link included more than once). This is the easiest file to work with for some cases but certainly not the most efficient.
+This is a text file with a line for every article with the article name followed by a metadata column and then all the links it has separated by `|` characters. All links are with redirects already followed and all links are verified to point to a valid page and are unique-d (no link included more than once). This is the easiest file to work with for some cases but certainly not the most efficient.
+
+The metadata column currently contains the length of the page markup in bytes followed by a `-` and then a series of characters each of which represents a page tag. Currently the only tag is `D` which signifies a disambiguation page.
 
 Here's an example with many links truncated since these pages actually have hundreds of links:
 
 ```
-A|Letter (alphabet)|Vowel|ISO basic Latin alphabet|Alpha|Italic type
-Achilles|Kantharos|Vulci|Cabinet des Médailles|Phthia|Thetis|Chiton (costume)
+A|2889-|Letter (alphabet)|Vowel|ISO basic Latin alphabet|Alpha|Italic type
+Achilles|2924-|Kantharos|Vulci|Cabinet des Médailles|Phthia|Thetis|Chiton (costume)
 ```
 
 Note that this is meant to be parsed with a `split` operation and as such a page with no links is just the page name with no `|`.

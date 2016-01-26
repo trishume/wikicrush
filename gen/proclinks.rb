@@ -18,7 +18,7 @@ end
 puts "Processing..."
 out = File.open(out_path,'w')
 IO.foreach(links_path) do |l|
-  page, *links = l.split('|').map { |x| x.strip }
+  page,meta,*links = l.split('|').map { |x| x.strip }
   # next if page.length == 0
   links.reject! { |li| li.length == 0 }
   links.each do |li|
@@ -26,7 +26,7 @@ IO.foreach(links_path) do |l|
   end
   links.map! { |li| redirects[li] || li }
   links = links.select { |li| valid.has_key?(li) }.uniq
-  links.unshift(page)
+  links.unshift(page,meta)
   out.puts links.join('|')
 end
 out.close

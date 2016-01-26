@@ -25,7 +25,8 @@ class Parser
   end
 
   def page(line)
-    fill(line.shift, line)
+    name, meta, *links = line
+    fill(name, meta, links)
   end
 
   def file_header
@@ -34,7 +35,7 @@ class Parser
     @out.write([1,@total,FILE_HEADER_SIZE,0].pack("L*"))
   end
 
-  def fill(title, ls)
+  def fill(title, meta, ls)
     link_data = ls.map{ |l| get_offset(l)}
     @out.write([0,link_data.length,0].pack("LLL")) # header
     @out.write(link_data.pack("L*"))

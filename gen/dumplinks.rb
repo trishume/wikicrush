@@ -2,6 +2,7 @@ require 'ox'
 
 class Handler < ::Ox::Sax
   LINK_REGEX = /\[\[([^|\n\]]+)(?:\|[^\n\]]+)?\]\]|(&lt;!--)|(--&gt;)/
+  DIS_REGEX = /\{\{\s*((?:Disambiguation[^}]*)|Airport disambiguation|Biology disambiguation|Call sign disambiguation|Caselaw disambiguation|Chinese title disambiguation|Genus disambiguation|Geodis|Hndis|Hndis-cleanup|Hospital disambiguation|Letter disambiguation|Letter-NumberCombDisambig|Mathematical disambiguation|Mil-unit-dis|Numberdis|Phonetics disambiguation|Road disambiguation|School disambiguation|Species Latin name disambiguation|Wikipedia disambiguation|disambig|dab|disamb)\s*\}\}/i
   def initialize(link_file, redir_file)
     @link_file = File.open(link_file,"w")
     @redir_file = File.open(redir_file,"w")
@@ -13,6 +14,7 @@ class Handler < ::Ox::Sax
       @title = nil
       @links = []
       @is_redirect = false
+      @is_disambig = false
     when :redirect
       @is_redirect = true
     when :title
@@ -40,6 +42,7 @@ class Handler < ::Ox::Sax
     when @in_title
       @title = value
     when @in_text
+      @page_length = value.bytesize
       @real_text = true
       value.scan(LINK_REGEX) do |lin, op, clos|
         # p [lin,op,clos,@real_text]
@@ -50,6 +53,9 @@ class Handler < ::Ox::Sax
         elsif clos
           @real_text = true
         end
+      end
+      if DIS_REGEX =~ value
+        @is_disambig = true
       end
     end
   end
@@ -66,7 +72,7 @@ class Handler < ::Ox::Sax
   end
 
   def do_real_page
-    @link_file.puts "#{@title}|#{@links.map{ |x| x.strip }.join('|')}"
+    @link_file.puts "#{@title}|#{@page_length}-#{@is_disambig ? 'D' : ''}|#{@links.map{ |x| x.strip }.join('|')}"
   end
 
   def do_redirect
