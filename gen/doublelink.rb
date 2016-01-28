@@ -3,7 +3,7 @@ require "progress"
 class Parser
   FILE_HEADER_SIZE = 4*4
   LINK_SIZE = 4
-  HEADER_SIZE = 4*3
+  HEADER_SIZE = 4*4
 
   def initialize(f, out_path)
     @f = f

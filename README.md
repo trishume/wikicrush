@@ -12,7 +12,7 @@ Wikicrush was created for use in [Rate With Science](http://github.com/trishume/
 
 You can either run the process yourself and get all the files plus control over the source dump by following the steps at the bottom or you can use the download I have prepared.
 
-The download is a zip file containing just `xindex.db` and `indexbi.bin` and was generated from `enwiki-20150205-pages-articles.xml.bz2` (i.e the February 2015 english Wikipedia dump). The file is 740MB and can be downloaded here: [http://thume.net/bigdownloads/wikidata.zip](http://thume.net/bigdownloads/wikidata.zip).
+The download is a zip file containing just `xindex.db` and `indexbi.bin` and was generated from `enwiki-20150205-pages-articles.xml.bz2` (i.e the February 2015 english Wikipedia dump). The file is 740MB and can be downloaded here: [http://thume.net/bigdownloads/wikidata.zip](http://thume.net/bigdownloads/wikidata.zip). **Note:** This uses the old graph format v1, see the `v1` branch readme for the old format. I'll try and process another more recent wiki dump into the new format soon.
 
 
 # The Files
@@ -39,11 +39,12 @@ The first 4 ints are the file header. First the version, next the total number o
 After this is **P** page data sections, each page is placed one after another until the end of the file.
 
 ##### Pages
-Each page starts with a 3 int page header:
+Each page starts with a 4 int page header:
 
 1. The first int is zero and is reserved for the user. I have used this for marking pages as seen and referencing the parent page during breadth-first-search path finding. This way no external data tables are necessary. Useful when you `read` the file into a mutable array in memory.
 2. The number of links **N** that the page has.
 3. The number of bidirectional links **B** the page has. These are links where the page being linked to also links back to this page. This generally implies a stronger connection between the topics of the two pages.
+4. A metadata integer **M** with a bunch of bit fields and some zeroes that should be ignored for adding future metadata
 
 This header is followed by **N** ints containing the byte offsets of the pages linked to. The first **B** of these are the pages that also link back to this page. Note that the offsets are in *bytes* rather than ints so you may have to do some dividing by 4 when following these links to other pages in your data int array.
 
@@ -53,8 +54,30 @@ The next page section starts after the **N** links. This allows one to iterate t
 ##### Overall Structure
 
 In a wacky notation where `{}` denote logical sections that are really just adjacent in the file and each element is a 4-byte int the file looks like this:
-```{{version, P, ?, ?}, {{0,N,B},{link, ...}},{{0,N,B},{link, ...}}, ...}```
+```{{version, P, ?, ?}, {{0,N,B,M},{link, ...}},{{0,N,B,M},{link, ...}}, ...}```
 See `analyze/graph.rb` for an example of how to use this file in Ruby or `analyze/strong_conn.rs` for a Rust example.
+
+##### Metadata
+32 bits of metadata packed into integer bit fields of **M**, from least significant bits to most significant:
+
+    3 bits = log10(length of article markup in bytes)
+    4 bits = min(number of words in title, 15)
+    1 bit = 1 if is a disambiguation page
+    3 bits = article namespace index in [normal, category, wikipedia, portal, book ... reserved for future ... 7=other namespace]
+    1 bit = 1 if page is a "List of" article
+    1 bit = 1 if page is a year
+    The following bits are not set by this script but their places are reserved
+    1 bit = if the article is a featured article
+    1 bit = if the article is a "good" article
+    (32-15=17) bits of zeroes reserved for future use
+
+Example: if you want to extract the article namespace number from an integer `m` you could use code like (C-style bitwise operations):
+
+```c
+    (m >> 8) & 0b111 // or 0x7 or just 7
+```
+
+Because the namespace field is offset (3+4+1)=8 bits from the start and is 3 bits long.
 
 ### xindex.db
 

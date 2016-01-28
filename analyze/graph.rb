@@ -7,7 +7,7 @@ class File
 end
 
 class Graph
-  HEADER_SIZE = 3
+  HEADER_SIZE = 4
   def initialize(f,db_path, dbg = true)
     @debug = dbg
     debug "loading file"
@@ -28,6 +28,10 @@ class Graph
 
   def bi_link_count(p)
     at(p,2)
+  end
+
+  def meta(p)
+    at(p,3)
   end
 
   def page_links(p)

@@ -5,7 +5,7 @@ require "triez"
 class Parser
   FILE_HEADER_SIZE = 4*4
   LINK_SIZE = 4
-  HEADER_SIZE = 4*3
+  HEADER_SIZE = 4*4
   attr_accessor :pos
 
   def initialize(f,db_path)

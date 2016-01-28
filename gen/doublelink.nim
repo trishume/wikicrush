@@ -8,7 +8,7 @@ const
   kPageUserDataField = 0
   kPageLinksField = 1
   kPageBidLinksField = 2
-  kPageHeaderSize = 3
+  kPageHeaderSize = 4
   kFirstPageIndex = 4
 
 proc offset*[A](some: ptr A; b: int): ptr A =

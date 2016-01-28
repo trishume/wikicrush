@@ -10,7 +10,7 @@ use std::mem;
 use std::old_io::File;
 
 static FILE_HEADER_SIZE : usize = 4*4;
-static PAGE_HEADER_SIZE : usize = 3;
+static PAGE_HEADER_SIZE : usize = 4;
 
 static PAGE_USER_DATA : usize = 0;
 static PAGE_LINKS : usize = 1;

@@ -8,7 +8,7 @@ file "data/links-raw.txt", :dump_path do |t,args|
 end
 
 file "data/links-filt.txt" => ["data/links-raw.txt"] do
-  sh "grep -Ev \"^(File|Template|Wikipedia|Help|Draft):\" data/links-raw.txt > data/links-filt.txt"
+  sh "grep -Ev \"^(File|Template|Help|Draft):\" data/links-raw.txt > data/links-filt.txt"
 end
 
 file "data/titles.txt" => ["data/links-filt.txt"] do

@@ -19,6 +19,7 @@ raise "Could not find page" unless q
 
 puts "Name: #{g.name(q)}"
 puts "Index: #{q}"
+puts "Meta: #{g.meta(q).to_s(2).rjust(32,'0')}"
 puts "Link Count: #{g.link_count(q)}"
 puts "Bidirectional Links: #{g.bi_link_count(q)}"
 puts "Bidirectional Links:"
