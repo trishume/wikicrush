@@ -64,3 +64,8 @@ end
 task :strong_conn => ["bin/strong_conn"] do
   sh "./bin/strong_conn data/index.bin"
 end
+
+task :nocase => ["data/xindex.db"] do
+  cp "data/xindex.db", "data/xindex-nocase.db"
+  sh "sqlite3 data/xindex-nocase.db < gen/nocase.sql"
+end
