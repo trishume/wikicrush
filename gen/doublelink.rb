@@ -61,6 +61,8 @@ end
 raise "Usage: ruby 5-doublelink.rb path/to/index.bin path/to/put/newindex.bin" unless ARGV.length == 2
 bin_path, out_path = ARGV
 
+puts "Bidirectionally linking file."
+puts "This Ruby version is super slow. Install Nim, delete indexbi.bin and run again to get the super fast Nim version."
 f = File.open(bin_path)
 p = Parser.new(f, out_path)
 p.run
