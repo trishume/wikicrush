@@ -35,9 +35,11 @@ class Parser
   end
 
   def page_links
-    raise "Header fail at #{@f.pos - 4}" unless get_int == 0
+    user_data = get_int
+    raise "Header fail at #{@f.pos - 4}: #{user_data} should be 0" unless user_data == 0
     num_links = get_int
     raise "Already processed" unless get_int == 0
+    get_int # metadata
     (1..num_links).map {get_int}
   end
 

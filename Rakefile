@@ -32,7 +32,7 @@ file "data/index.bin" => ["data/links.txt","data/xindex.db"] do
 end
 
 file "data/indexbi.bin" => ["data/index.bin"] do
-  if system("which","nim")
+  if system("which","nim") && false
     sh "nim c -d:release gen/doublelink.nim"
     sh "./gen/doublelink"
   else
