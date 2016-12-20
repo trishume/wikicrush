@@ -22,14 +22,14 @@ class Parser
   def do_page
     # puts "Doing page at #{@f.pos}"
     this_page = @f.pos
-    links = page_links
+    links, meta = page_links
     double,single = links.partition { |l| bidirectional?(l,this_page)}
-    output_page(double,single)
+    output_page(double,single,meta)
   end
 
-  def output_page(double,single)
+  def output_page(double,single, meta)
     total = double.length + single.length
-    @out.write([0,total,double.length].pack("LLL")) # header
+    @out.write([0,total,double.length,meta].pack("LLL")) # header
     @out.write(double.pack("L*"))
     @out.write(single.pack("L*"))
   end
@@ -39,8 +39,8 @@ class Parser
     raise "Header fail at #{@f.pos - 4}: #{user_data} should be 0" unless user_data == 0
     num_links = get_int
     raise "Already processed" unless get_int == 0
-    get_int # metadata
-    (1..num_links).map {get_int}
+    meta = get_int # metadata
+    return ((1..num_links).map {get_int}), meta
   end
 
   private
